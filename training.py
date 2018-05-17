@@ -2,7 +2,7 @@ import face_recognition
 import json
 import pickle
 import FaceRecognition
-import glob
+import glob,sys
  
 #Input
 # inputPictures = ["unknow_image/12828502_1005842369534847_7136850454606854375_o.jpg",
@@ -11,13 +11,38 @@ import glob
 #                  "unknow_image/25358342_1566786296773782_5191830380202574644_o.jpg"]a
 
 #Get from training_picture dir
-inputPictures = glob.glob("training_picture/*.jpg")
+ 
+ 
+
+
+if len(sys.argv) != 3 :
+    print("Please enter activity_id argument")
+ 
+
+
+arguments     = sys.argv
+types         = ('*.jpg', '*.JPG') 
+inputPictures = []
+
+for files in types:
+        inputPictures.extend(glob.glob(arguments[2]+'/'+files))
+
+
+#inputPictures = glob.glob("training_picture/*.jpg")
  
 encodeReresult = {}
-photoId = 0    
+
 for path in inputPictures:
-    encodeReresult[path] = FaceRecognition.getEncodePicture(path)
-with open('dataset_faces.dat', 'wb') as f:
+    print("Start File:",path)
+    bufferEncodeing = FaceRecognition.getEncodePicture(path)
+    index = 0    
+    for i in bufferEncodeing:
+            encodeReresult[path+"_"+str(index)] = i
+            index += 1
+    countFace = len(bufferEncodeing)
+    print("Finish:",path,countFace)
+print("All Face:",len(encodeReresult))
+with open('datasets/dataset_'+arguments[1]+'.dat', 'wb') as f:
     pickle.dump(encodeReresult, f)
 
 exit()
